@@ -1,11 +1,14 @@
 import socket
 import os
-from _thread import *
+from threading import *
+from queue import Queue
+
+dspQueue = Queue()
+workQueue = Queue()
 
 s = socket.socket()
 host = '192.168.1.145'
 port = 12345
-ThreadCount = 0
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 try:
     s.bind((host,port))
@@ -15,50 +18,63 @@ except socket.error as e:
 print('I\'m listening...')
 s.listen(5)
 
-signal = False
-
+# Control logic for the DSP connections in parallel
+def handle_dsp(connection):
+    global workQueue
+    done = False
+    while True:
+        if not done and workQueue.qsize() > 0:
+            print("waiting on work")
+            msg = workQueue.get()
+            connection.sendall(msg)
+            data = connection.recv(2048)
+            if not data:
+                break
+            print(data.decode())
+            done = True
+            print("work done")
+        if workQueue.empty():
+            print("time for new work")
+            done = False
+    connection.close()
+    
+#Control logic for the site connection in parallel
+def handle_site(connection):
+    global workQueue
+    global dspQueue
+    while True:
+        print("Waiting on data")
+        msg = connection.recv(2048)
+        print("Data received: " + msg.decode())
+        if not msg:
+            break
+        
+        workerAmount = dspQueue.qsize()
+        for i in range(workerAmount):
+            workQueue.put(msg)
+        
+            
+#Determine if incoming connection is a DSP or client
 def handle_client(connection):
-    global signal
     dsp = False
+    global dspQueue
     
     connection.sendall(str.encode('Server is working:'))
     data = connection.recv(2048)
     if data.decode() == 'DSP':
         print('DSP connected')
-        lock = True
-        dsp = True
+        dsp = Thread(target=handle_dsp, args=(connection, ))
+        dspQueue.put(dsp)
+        dsp.start()
     else:
         print('Non DSP')
-        lock = False
-    while True:
-        if signal and lock and dsp:
-            msg = 'advert pls'
-            connection.sendall(msg.encode())
-            data = connection.recv(2048)
-            if not data:
-                break
-            print(data.decode())
-            lock = False
-        if not signal and not lock and dsp:
-            lock = True
-        elif not lock and not dsp:
-            data = connection.recv(2048)
-            print(data.decode())
-            if not data:
-                print("Signal is now false")
-                signal = False
-                break
-            if data.decode() == 'AD PLS':
-                signal = True
-                print("Signal is here")
-    connection.close()
+        site = Thread(target=handle_site, args=(connection, ))
+        site.start()
 
 
 while True:
     c, addr = s.accept()
     print("Got connection from", addr)
-    start_new_thread(handle_client, (c, ))
-    ThreadCount += 1
-    print('Thread Number: ' + str(ThreadCount))
+    handle_client(c)
 s.close()
 
