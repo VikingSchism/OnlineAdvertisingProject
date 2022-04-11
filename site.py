@@ -11,8 +11,10 @@ try:
     data = s.recv(1024)
     print(data.decode())
     time.sleep(0.1)
+    tic = time.perf_counter()
     s.sendall(b'AD PLS')
-    data = s.recv(1024)
+    toc = time.perf_counter()
+    print(f"Time taken: {toc - tic}")
     s.close()
 except:
     print("Cannot connect to server")

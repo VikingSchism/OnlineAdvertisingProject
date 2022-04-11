@@ -33,8 +33,7 @@ def handle_dsp(connection):
             print(data.decode())
             done = True
             print("work done")
-        if workQueue.empty():
-            print("time for new work")
+        if workQueue.empty() and done:
             done = False
     connection.close()
     

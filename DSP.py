@@ -23,10 +23,9 @@ def connectToSSP(bidDict):
             if not incoming:
                 break
             print("Got a message: " + incoming)
-            if incoming == 'advert pls':
-                aucRes = doAuction(bidDict)
-                reply = str(aucRes)
-                s.sendall(reply.encode())
+            aucRes = doAuction(bidDict)
+            reply = str(aucRes)
+            s.sendall(reply.encode())
         s.close()
     except ConnectionRefusedError:
         print("Cannot connect to server")
