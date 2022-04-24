@@ -23,9 +23,10 @@ def connectToSSP(bidDict):
             if not incoming:
                 break
             print("Got a message: " + incoming)
-            aucRes = doAuction(bidDict)
-            reply = str(aucRes)
-            s.sendall(reply.encode())
+            if incoming != 'Server is working':
+                aucRes = doAuction(bidDict)
+                reply = str(aucRes)
+                s.sendall(reply.encode())
         s.close()
     except ConnectionRefusedError:
         print("Cannot connect to server")
@@ -37,6 +38,5 @@ try:
 except FileNotFoundError:
     print("There doesn't seem to be a file with that name.")
     quit()
-print(str(doAuction(bidDict)))
 
 connectToSSP(bidDict)
