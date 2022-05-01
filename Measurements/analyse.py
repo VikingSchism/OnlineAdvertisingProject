@@ -4,7 +4,7 @@ import json
 
 vals = []
 
-for i in range(1,7):
+for i in range(1,8):
     watts = []
     with open('watts_' + str(i) + 'thread.out') as f:
         lines = f.readlines()
