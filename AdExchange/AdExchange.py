@@ -44,7 +44,7 @@ def handle_dsp(connection):
     connection.close()
     
 #Control logic for the site connection in parallel
-def handle_site(connection):
+def handle_ssp(connection):
     global workQueue
     global dspQueue
     global aucQueue
@@ -70,10 +70,9 @@ def handle_site(connection):
     connection.close()
         
             
-#Determine if incoming connection is a DSP or client
+#Determine if incoming connection is a DSP or SSP
 def handle_client(connection):
     global dspQueue
-    
     connection.sendall(str.encode('Server is working'))
     data = connection.recv(2048)
     print(data)
@@ -84,10 +83,10 @@ def handle_client(connection):
         dsp.start()
     else:
         print('Non DSP')
-        site = Thread(target=handle_site, args=(connection, ))
-        site.start()
+        ssp = Thread(target=handle_ssp, args=(connection, ))
+        ssp.start()
 
-
+        
 while True:
     c, addr = s.accept()
     print("Got connection from", addr)
