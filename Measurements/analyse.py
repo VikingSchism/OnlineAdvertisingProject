@@ -21,10 +21,20 @@ for i in range(1,8):
     vals.append(watts)
 
 fig, ax = plt.subplots()
-ax.boxplot(vals)
+bp = ax.boxplot(vals, showmeans=True)
 ax.set_xlabel("DSPs connected")
 ax.set_ylabel("Power (W)")
 ax.set_title("Connected DSPs vs idle power consumption")
+
+mins = [round(item.get_ydata()[0],1) for item in bp['caps']][::2]
+maxs = [round(item.get_ydata()[0],1) for item in bp['caps']][1::2]
+
+ranges = list(map(lambda x, y: x - y, maxs, mins))
+print(ranges)
+
+for li in vals:
+    print(len(li), ", ", np.mean(li))
+    
 #for i in range(3):
 #    axs1[i].plot(np.arange(len(vals[i])), np.array(vals[i]))
 #    axs1[i].plot(np.arange(len(vals[i])), np.repeat(np.average(vals[i]), len(vals[i])))
