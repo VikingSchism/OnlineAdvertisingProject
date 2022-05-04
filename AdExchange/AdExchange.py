@@ -3,13 +3,14 @@ import os
 from threading import *
 from queue import Queue
 from ast import literal_eval
+import sys
 
 dspQueue = Queue()
 workQueue = Queue()
 aucQueue = Queue()
 
 s = socket.socket()
-host = '192.168.1.145'
+host = sys.argv[1]
 port = 12345
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 try:
