@@ -27,6 +27,7 @@ s.listen(5)
 def handle_dsp(connection):
     global workQueue
     global aucQueue
+    global dspQueue
     done = False
     while True:
         if not done and workQueue.qsize() > 0:
@@ -42,6 +43,7 @@ def handle_dsp(connection):
             print("work done")
         if workQueue.empty() and done:
             done = False
+    dspQueue.get()
     connection.close()
     
 #Control logic for the site connection in parallel
