@@ -21,7 +21,7 @@ for i in range(1,8):
     vals.append(watts)
 
 fig, ax = plt.subplots()
-bp = ax.boxplot(vals, showmeans=True)
+bp = ax.boxplot(vals, showmeans=True, notch=True)
 ax.set_xlabel("DSPs connected")
 ax.set_ylabel("Power (W)")
 ax.set_title("Connected DSPs vs idle power consumption")

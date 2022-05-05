@@ -22,7 +22,7 @@ with open('watts_' + dsps + '_ssp.out') as f:
 
 
 fig, ax = plt.subplots()
-bp = ax.boxplot(vals, showmeans=True)
+bp = ax.boxplot(vals, showmeans=True, notch=True)
 
 mins = [round(item.get_ydata()[0],3) for item in bp['caps']][::2]
 maxs = [round(item.get_ydata()[0],3) for item in bp['caps']][1::2]
